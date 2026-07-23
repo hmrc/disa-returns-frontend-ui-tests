@@ -17,25 +17,40 @@
 package uk.gov.hmrc.ui.pages
 
 import org.openqa.selenium.support.ui.{ExpectedConditions, FluentWait, Wait}
-import org.openqa.selenium.{By, WebDriver}
+import org.openqa.selenium.{By, WebDriver, WebElement}
 import org.scalatest.matchers.should.Matchers
 import uk.gov.hmrc.selenium.component.PageObject
 import uk.gov.hmrc.selenium.webdriver.Driver
 import uk.gov.hmrc.ui.conf.TestConfiguration
 
+import scala.jdk.CollectionConverters.CollectionHasAsScala
 import java.time.Duration
 
 trait BasePage extends PageObject with Matchers {
   val pageUrl: String
-  val baseUrl: String           = TestConfiguration.url("disa-registration-frontend")
+  val baseUrl: String           = TestConfiguration.url("disa-returns-frontend")
   val signInButtonClassName: By = By.partialLinkText("Sign in")
   val saveAndContinueButton: By = By.xpath("//button[contains(text(),'Save and continue')]")
-  val continueButton: By        = By.xpath("//a[contains(text(),'Continue')]")
+  val continueButton: By        = By.xpath("//button[contains(text(),'Continue')]")
   val signOutButton: By         = By.xpath("//a[contains(text(),'Sign out')]")
   val pageHeader: By            = By.xpath("//h1")
+  val usrDir: String            = System.getProperty("user.dir") + "/src/test/resources/testData/"
+  var filePath                  = ""
+
+  def uploadFilesToBrowser(fileSeq: String, elementID: String): Unit = {
+    fileSeq match {
+      case "first"  => filePath = usrDir + "isa-open-valid.xlsx"
+      case "second" => filePath = usrDir + "isa-open-empty.xlsx"
+    }
+
+    Driver.instance.findElement(By.id(elementID)).sendKeys(filePath)
+    Driver.instance.findElement(By.id("file")).isEnabled
+  }
 
   def verifyPageUrl(): Boolean =
     getCurrentUrl == pageUrl
+
+  def findById(id: String): WebElement = find(By.id(id))
 
   def verifyPageTitle(pageTitle: String, url: String): Boolean = {
     verifyPageLoaded(url)
@@ -70,12 +85,21 @@ trait BasePage extends PageObject with Matchers {
     verifyPageLoaded(url)
   }
 
+  def find(by: By): WebElement = {
+    fluentWait.until(ExpectedConditions.presenceOfElementLocated(by))
+    Driver.instance.findElement(by)
+  }
+
   def goTo(page: BasePage): Unit = navigateTo(page.pageUrl)
 
-  def clickOnByPartialLinkText(partialLinkText: By): Unit = {
-    verifyPageLoaded()
-    click(partialLinkText)
-  }
+  def clickOnByPartialLinkText(partialLinkText: String): Unit =
+    click(By.partialLinkText(partialLinkText))
+
+  def clickOnByLinkText(LinkText: String): Unit =
+    click(By.ByLinkText(LinkText))
+
+  def clickRadioButton(text: String): Unit =
+    Driver.instance.findElements(By.tagName("label")).asScala.filter(_.getText.trim == text).head.click()
 
   def isElementPresent(locator: By): Boolean =
     Driver.instance.findElements(locator).size() > 0

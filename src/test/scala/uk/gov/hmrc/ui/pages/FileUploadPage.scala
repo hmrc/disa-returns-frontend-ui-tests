@@ -16,9 +16,23 @@
 
 package uk.gov.hmrc.ui.pages
 
-object FIleUploadPage extends BasePage {
+import org.openqa.selenium.{By, WebElement}
+
+object FileUploadPage extends BasePage {
   val pageUrl: String   = s"$baseUrl/file-upload"
   val pageTitle: String =
     "Upload your report file - Manage ISAs - GOV.UK"
+
+  def uploadFile(fileSeq: String): Unit = uploadFilesToBrowser(fileSeq, "file")
+
+  def chooseFileAndUploadFile(fileSeq: String): Unit =
+    FileUploadPage.uploadFile(fileSeq)
+
+  // second method
+  def BrowseAndUpload(file: String): Unit =
+    if (file != "") {
+      findById("file")
+        .sendKeys(System.getProperty("user.dir") + "/src/test/resources/testData/" + file)
+    }
 
 }
