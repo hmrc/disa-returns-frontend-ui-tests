@@ -18,7 +18,7 @@ package uk.gov.hmrc.ui.pages
 
 object DeclarationPage extends BasePage {
   val pageUrl: String   = s"$baseUrl/declaration"
-  val pageTitle: String ="Declaration - Manage ISAs - GOV.UK"
+  val pageTitle: String = "Declaration - Manage ISAs - GOV.UK"
 
-    val pageTitleTwo: String = "Declaration for nil report - Manage ISAs - GOV.UK"
+  val pageTitleTwo: String = "Declaration for nil report - Manage ISAs - GOV.UK"
 }

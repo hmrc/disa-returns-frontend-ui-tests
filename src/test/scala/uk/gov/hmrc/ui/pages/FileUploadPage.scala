@@ -31,15 +31,4 @@ object FileUploadPage extends BasePage {
   def thenWaitForXSeconds(secs: Int): Unit =
     secondsWait(secs)
 
-  def WaitForFileUpload(): Unit =
-    waitForFileUpload
-
-    def waitForFileUpload: Boolean =
-      try {
-        waitForVisible(By.id("upload-in-progress-heading"))
-        true
-      } catch {
-        case _: NoSuchElementException => false
-      }
-
 }
