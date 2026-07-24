@@ -16,10 +16,8 @@
 
 package uk.gov.hmrc.ui.pages
 
-object UlploadedReportFilesPage extends BasePage {
-  val pageUrl: String      = s"$baseUrl/uploaded-report-files"
-  val pageTitle: String    =
-    "You have added a report file - Manage ISAs - GOV.UK"
-  val pageTitleTwo: String =
-    "You have added 2 report files - Manage ISAs - GOV.UK"
+object SubmissionCompletePage extends BasePage {
+  val pageUrl: String   = s"$baseUrl/submission-complete"
+  val pageTitle: String =
+    "Submission complete - Manage ISAs - GOV.UK"
 }

@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.ui.pages
 
-import org.openqa.selenium.{By, WebElement}
+import org.openqa.selenium.{By, NoSuchElementException}
 
 object FileUploadPage extends BasePage {
   val pageUrl: String   = s"$baseUrl/file-upload"
@@ -28,11 +28,18 @@ object FileUploadPage extends BasePage {
   def chooseFileAndUploadFile(fileSeq: String): Unit =
     FileUploadPage.uploadFile(fileSeq)
 
-  // second method
-  def BrowseAndUpload(file: String): Unit =
-    if (file != "") {
-      findById("file")
-        .sendKeys(System.getProperty("user.dir") + "/src/test/resources/testData/" + file)
-    }
+  def thenWaitForXSeconds(secs: Int): Unit =
+    secondsWait(secs)
+
+  def WaitForFileUpload(): Unit =
+    waitForFileUpload
+
+    def waitForFileUpload: Boolean =
+      try {
+        waitForVisible(By.id("upload-in-progress-heading"))
+        true
+      } catch {
+        case _: NoSuchElementException => false
+      }
 
 }

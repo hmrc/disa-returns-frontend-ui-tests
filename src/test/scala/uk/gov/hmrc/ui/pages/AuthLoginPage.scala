@@ -24,9 +24,9 @@ object AuthLoginPage extends BasePage {
   override val pageUrl: String = TestConfiguration.url("auth-login-stub") + "/gg-sign-in"
 
   private val redirectionUrlById: By = By.id("redirectionUrl")
-  private val affinityGroupById: By = By.id("affinityGroupSelect")
-  private val authSubmitById: By = By.id("submit-top")
-  private val baseUrl: String = TestConfiguration.url("disa-returns-frontend")
+  private val affinityGroupById: By  = By.id("affinityGroupSelect")
+  private val authSubmitById: By     = By.id("submit-top")
+  private val baseUrl: String        = TestConfiguration.url("disa-returns-frontend")
 
   private def loadPage: this.type = {
     get(pageUrl)
@@ -44,11 +44,11 @@ object AuthLoginPage extends BasePage {
   }
 
   private def submitAuthWithEnrollmentInfo(
-                                            redirectionUrl: String,
-                                            enrolmentKey: String,
-                                            IdentifierName: String,
-                                            IdentifierValue: String
-                                          ): Unit = {
+    redirectionUrl: String,
+    enrolmentKey: String,
+    IdentifierName: String,
+    IdentifierValue: String
+  ): Unit = {
     loadPage
     sendKeys(redirectionUrlById, s"$baseUrl$redirectionUrl")
     selectByVisibleText(affinityGroupById, "Organisation")
@@ -59,9 +59,9 @@ object AuthLoginPage extends BasePage {
   }
 
   private def submitAuthWithGroupId(
-                                     redirectionUrl: String,
-                                     groupId: String
-                                   ): Unit = {
+    redirectionUrl: String,
+    groupId: String
+  ): Unit = {
     loadPage
     sendKeys(redirectionUrlById, s"$baseUrl$redirectionUrl")
     selectByVisibleText(affinityGroupById, "Organisation")
@@ -80,11 +80,11 @@ object AuthLoginPage extends BasePage {
     submitAuth(redirectionUrl)
 
   def loginAsEnrolledUser(
-                           redirectionUrl: String,
-                           enrolmentKey: String,
-                           IdentifierName: String,
-                           IdentifierValue: String
-                         ): Unit =
+    redirectionUrl: String,
+    enrolmentKey: String,
+    IdentifierName: String,
+    IdentifierValue: String
+  ): Unit =
     submitAuthWithEnrollmentInfo(redirectionUrl, enrolmentKey, IdentifierName, IdentifierValue)
 
   def loginAsPendingEnrollmentUser(redirectionUrl: String, groupId: String): Unit =

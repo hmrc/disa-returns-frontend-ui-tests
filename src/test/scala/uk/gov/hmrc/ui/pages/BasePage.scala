@@ -16,7 +16,8 @@
 
 package uk.gov.hmrc.ui.pages
 
-import org.openqa.selenium.support.ui.{ExpectedConditions, FluentWait, Wait}
+import org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable
+import org.openqa.selenium.support.ui.{ExpectedCondition, ExpectedConditions, FluentWait, Wait, WebDriverWait}
 import org.openqa.selenium.{By, WebDriver, WebElement}
 import org.scalatest.matchers.should.Matchers
 import uk.gov.hmrc.selenium.component.PageObject
@@ -32,6 +33,7 @@ trait BasePage extends PageObject with Matchers {
   val signInButtonClassName: By = By.partialLinkText("Sign in")
   val saveAndContinueButton: By = By.xpath("//button[contains(text(),'Save and continue')]")
   val continueButton: By        = By.xpath("//button[contains(text(),'Continue')]")
+  val agreeAndSubmit: By        = By.xpath("//button[contains(text(),'I agree - submit')]")
   val signOutButton: By         = By.xpath("//a[contains(text(),'Sign out')]")
   val pageHeader: By            = By.xpath("//h1")
   val usrDir: String            = System.getProperty("user.dir") + "/src/test/resources/testData/"
@@ -43,14 +45,21 @@ trait BasePage extends PageObject with Matchers {
       case "second" => filePath = usrDir + "isa-open-empty.xlsx"
     }
 
-    Driver.instance.findElement(By.id(elementID)).sendKeys(filePath)
-    Driver.instance.findElement(By.id("file")).isEnabled
+    Driver.instance.findElement(By.id("file-input")).sendKeys(filePath)
+    Driver.instance.findElement(By.id("file-input")).isEnabled
   }
+
+  def waitFor[T](condition: ExpectedCondition[T]): T = {
+    val wait = new WebDriverWait(Driver.instance, Duration.ofSeconds(10))
+    wait.until(condition)
+  }
+
+  def waitForVisible(by: By): Unit = waitFor(elementToBeClickable(by))
+
+  def secondsWait(secs: Int): Unit = Thread.sleep(secs.*(1000))
 
   def verifyPageUrl(): Boolean =
     getCurrentUrl == pageUrl
-
-  def findById(id: String): WebElement = find(By.id(id))
 
   def verifyPageTitle(pageTitle: String, url: String): Boolean = {
     verifyPageLoaded(url)
@@ -109,6 +118,9 @@ trait BasePage extends PageObject with Matchers {
 
   def clickContinue(): Unit =
     click(continueButton)
+
+  def clickAgreeAndSubmit(): Unit =
+    click(agreeAndSubmit)
 
   def signOut(): Unit =
     click(signOutButton)
