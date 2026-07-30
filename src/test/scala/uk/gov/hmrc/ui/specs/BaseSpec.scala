@@ -19,7 +19,9 @@ package uk.gov.hmrc.ui.specs
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.{BeforeAndAfterEach, GivenWhenThen}
+import play.api.libs.ws.StandaloneWSResponse
 import uk.gov.hmrc.selenium.webdriver.{Browser, ScreenshotOnFailure}
+import uk.gov.hmrc.ui.pages.DisaReturnsService
 
 trait BaseSpec
     extends AnyFeatureSpec
@@ -35,4 +37,11 @@ trait BaseSpec
   override def afterEach(): Unit =
     quitBrowser()
 
+  val disaReturnsService: DisaReturnsService = new DisaReturnsService
+  val DeleteMonthlyReturnsUrl                = "http://localhost:1204/disa-returns-submission/test-only/monthly-returns"
+  def deleteMonthlyDeclarationRequest(
+  ): StandaloneWSResponse =
+    disaReturnsService.DeleteMonthlyReturns(
+      url = DeleteMonthlyReturnsUrl
+    )
 }

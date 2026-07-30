@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.ui.pages
 
+import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.support.ui.ExpectedConditions.elementToBeClickable
 import org.openqa.selenium.support.ui.{ExpectedCondition, ExpectedConditions, FluentWait, Wait, WebDriverWait}
 import org.openqa.selenium.{By, WebDriver, WebElement}
@@ -23,7 +24,7 @@ import org.scalatest.matchers.should.Matchers
 import uk.gov.hmrc.selenium.component.PageObject
 import uk.gov.hmrc.selenium.webdriver.Driver
 import uk.gov.hmrc.ui.conf.TestConfiguration
-
+import java.util
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 import java.time.Duration
 
@@ -45,8 +46,8 @@ trait BasePage extends PageObject with Matchers {
       case "second" => filePath = usrDir + "isa-open-empty.xlsx"
     }
 
-    Driver.instance.findElement(By.id("file-input")).sendKeys(filePath)
-    Driver.instance.findElement(By.id("file-input")).isEnabled
+    Driver.instance.findElement(By.id(elementID)).sendKeys(filePath)
+    Driver.instance.findElement(By.id(elementID)).isEnabled
   }
 
   def waitFor[T](condition: ExpectedCondition[T]): T = {
@@ -63,6 +64,17 @@ trait BasePage extends PageObject with Matchers {
 
   def verifyPageTitle(pageTitle: String, url: String): Boolean = {
     verifyPageLoaded(url)
+    val actualTitle = getTitle
+    if (actualTitle != pageTitle) {
+      println(s"[Title Mismatch] Expected: '$pageTitle' | Actual: '$actualTitle'")
+      false
+    } else {
+      true
+    }
+  }
+
+  def verifyPageTitleAndUrl(pageTitle: String, url: String): Boolean = {
+    verifyUrlWithIds(url)
     val actualTitle = getTitle
     if (actualTitle != pageTitle) {
       println(s"[Title Mismatch] Expected: '$pageTitle' | Actual: '$actualTitle'")
@@ -89,6 +101,8 @@ trait BasePage extends PageObject with Matchers {
 
   def verifyPageLoaded(url: String = this.pageUrl): Unit = fluentWait.until(ExpectedConditions.urlToBe(url))
 
+  def verifyUrlWithIds(url: String = this.pageUrl): Unit = fluentWait.until(ExpectedConditions.urlContains(url))
+
   def navigateTo(url: String): Unit = {
     Driver.instance.get(url)
     verifyPageLoaded(url)
@@ -98,6 +112,27 @@ trait BasePage extends PageObject with Matchers {
     fluentWait.until(ExpectedConditions.presenceOfElementLocated(by))
     Driver.instance.findElement(by)
   }
+
+  def disableJavaScript()(implicit driver: WebDriver): Unit =
+    driver match {
+      case chromeDriver: ChromeDriver =>
+        val params = new util.HashMap[String, AnyRef]()
+
+        params.put(
+          "value",
+          java.lang.Boolean.valueOf(true)
+        )
+
+        chromeDriver.executeCdpCommand(
+          "Emulation.setScriptExecutionDisabled",
+          params
+        )
+
+      case other =>
+        throw new RuntimeException(
+          s"Disabling JavaScript is only supported for ChromeDriver. Current driver: ${other.getClass.getName}"
+        )
+    }
 
   def goTo(page: BasePage): Unit = navigateTo(page.pageUrl)
 

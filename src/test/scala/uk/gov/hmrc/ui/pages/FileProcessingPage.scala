@@ -16,22 +16,11 @@
 
 package uk.gov.hmrc.ui.pages
 
-object FileUploadPage extends BasePage {
-  val pageUrl: String   = s"$baseUrl/file-upload"
-  val pageTitle: String =
-    "Upload your report file - Manage ISAs - GOV.UK"
+import org.openqa.selenium.{By, NoSuchElementException}
 
-  def uploadFile(fileSeq: String): Unit = uploadFilesToBrowser(fileSeq, "file-input")
+object FileProcessingPage extends BasePage {
+  val pageUrl: String   = s"$baseUrl/file-processing"
+  val pageTitle: String = "Your file is being checked - Manage ISAs - GOV.UK"
 
-  def uploadFileJSDisabled(fileSeq: String): Unit = uploadFilesToBrowser(fileSeq, "file")
-
-  def chooseFileAndUploadFile(fileSeq: String): Unit =
-    FileUploadPage.uploadFile(fileSeq)
-
-  def chooseFileAndUploadFileJSDisabled(fileSeq: String): Unit =
-    FileUploadPage.uploadFileJSDisabled(fileSeq)
-
-  def thenWaitForXSeconds(secs: Int): Unit =
-    secondsWait(secs)
 
 }
