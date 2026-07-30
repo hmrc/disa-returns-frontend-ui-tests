@@ -16,24 +16,27 @@
 
 package uk.gov.hmrc.ui.specs
 
-import uk.gov.hmrc.ui.pages.*
+import org.scalatest.BeforeAndAfterAll
 import uk.gov.hmrc.selenium.webdriver.Driver.instance
-import play.api.libs.ws.StandaloneWSResponse
+import uk.gov.hmrc.ui.pages.*
 
-class FileUploadSpec extends BaseSpec {
+class FileUploadSpec extends BaseSpec with BeforeAndAfterAll {
+
+  override protected def beforeAll(): Unit = {
+    super.beforeAll()
+
+    val response = deleteMonthlyDeclarationRequest()
+
+    withClue("Failed to clear Monthly Returns database: ") {
+      response.status shouldBe 204
+    }
+  }
 
   Feature("ISA manager logs in and submits a monthly report") {
 
     Scenario("1. ISA manager logs in and submits a monthly report with js enabled on browser") {
 
-      When("I clear data from Monthly Returns")
-      val deleteMonthlyDeclarationResponse: StandaloneWSResponse =
-        deleteMonthlyDeclarationRequest()
-
-      Then("A 204 status code is returned")
-      deleteMonthlyDeclarationResponse.status shouldBe 204
-
-      And("I wait for the file to be uploaded")
+      When("I wait for the file to be uploaded")
       FileUploadPage.thenWaitForXSeconds(10)
 
       Given("the ISA manager logs in as an already enrolled organisation User")

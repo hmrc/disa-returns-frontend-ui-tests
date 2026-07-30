@@ -38,7 +38,7 @@ trait BaseSpec
     quitBrowser()
 
   val disaReturnsService: DisaReturnsService = new DisaReturnsService
-  val DeleteMonthlyReturnsUrl                = "http://localhost:1204/disa-returns-submission/test-only/monthly-returns"
+  val DeleteMonthlyReturnsUrl                = "http://localhost:12103/disa-returns-submission/test-only/monthly-returns"
   def deleteMonthlyDeclarationRequest(
   ): StandaloneWSResponse =
     disaReturnsService.DeleteMonthlyReturns(

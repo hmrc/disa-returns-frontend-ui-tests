@@ -22,5 +22,4 @@ object FileProcessingPage extends BasePage {
   val pageUrl: String   = s"$baseUrl/file-processing"
   val pageTitle: String = "Your file is being checked - Manage ISAs - GOV.UK"
 
-
 }

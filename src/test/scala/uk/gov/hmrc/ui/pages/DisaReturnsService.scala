@@ -32,8 +32,6 @@ class DisaReturnsService extends HttpClient {
   private lazy val disaReturnsPath: String           = "/monthly"
   private lazy val disaReturnsCallbackPath: String   = "/callback/monthly"
   private lazy val disaReturnsBase: String           = s"$disaReturnsHost$disaReturnsPath"
-  
-  
 
   def postSubmission(
     isaManagerReference: String,
@@ -50,14 +48,14 @@ class DisaReturnsService extends HttpClient {
     )
 
   def DeleteMonthlyReturns(
-                        url: String,
-                    ): StandaloneWSResponse =
+    url: String
+  ): StandaloneWSResponse =
     Await.result(
       mkRequest(url)
         .delete(),
       10.seconds
     )
-    
+
   def postDeclaration(
     isaManagerReference: String,
     taxYear: String,
