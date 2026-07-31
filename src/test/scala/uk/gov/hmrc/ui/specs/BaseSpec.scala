@@ -39,9 +39,41 @@ trait BaseSpec
 
   val disaReturnsService: DisaReturnsService = new DisaReturnsService
   val DeleteMonthlyReturnsUrl                = "http://localhost:12103/disa-returns-submission/test-only/monthly-returns"
+  val DeleteMonthlyReturnsBackendUrl         = "http://localhost:1207/disa-returns-backend/test-only/monthly-returns"
+  val DeleteMonthlyReturnsFileUploadUrl      =
+    "http://localhost:1207/disa-returns-backend/test-only/monthly-return-file-upload-work-items"
+  val SetSubmissionsClock                    = "http://localhost:12103/disa-returns-submission/test-only/clock/2026-07-17"
+  val SetBackendClock                        = "http://localhost:1207/disa-returns-backend/test-only/clock/2026-07-17"
+  val declarationPeriodDate: String          = "2026-07-31"
+
   def deleteMonthlyDeclarationRequest(
   ): StandaloneWSResponse =
-    disaReturnsService.DeleteMonthlyReturns(
+    disaReturnsService.DeleteAll(
       url = DeleteMonthlyReturnsUrl
     )
+
+  def deleteMonthlyDeclarationBERequest(
+  ): StandaloneWSResponse =
+    disaReturnsService.DeleteAll(
+      url = DeleteMonthlyReturnsBackendUrl
+    )
+
+  def deleteMonthlyDeclarationFileRequest(
+  ): StandaloneWSResponse =
+    disaReturnsService.DeleteAll(
+      url = DeleteMonthlyReturnsFileUploadUrl
+    )
+
+  def setSubmissionsClock(
+  ): StandaloneWSResponse =
+    disaReturnsService.setClock(
+      date = declarationPeriodDate
+    )
+
+  def setBackendClock(
+  ): StandaloneWSResponse =
+    disaReturnsService.setBackendClock(
+      date = declarationPeriodDate
+    )
+
 }

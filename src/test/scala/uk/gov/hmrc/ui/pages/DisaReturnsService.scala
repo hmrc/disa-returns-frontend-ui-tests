@@ -29,6 +29,7 @@ class DisaReturnsService extends HttpClient {
 
   private lazy val disaReturnsHost: String           = TestEnvironment.url("disa-returns")
   private lazy val disaReturnsSubmissionHost: String = TestEnvironment.url("disa-returns-submission")
+  private lazy val disaReturnsBackendHost: String    = TestEnvironment.url("disa-returns-backend")
   private lazy val disaReturnsPath: String           = "/monthly"
   private lazy val disaReturnsCallbackPath: String   = "/callback/monthly"
   private lazy val disaReturnsBase: String           = s"$disaReturnsHost$disaReturnsPath"
@@ -47,7 +48,7 @@ class DisaReturnsService extends HttpClient {
       10.seconds
     )
 
-  def DeleteMonthlyReturns(
+  def DeleteAll(
     url: String
   ): StandaloneWSResponse =
     Await.result(
@@ -107,6 +108,13 @@ class DisaReturnsService extends HttpClient {
   def setClock(date: String): StandaloneWSResponse =
     Await.result(
       mkRequest(s"$disaReturnsSubmissionHost/test-only/clock/$date")
+        .put(""),
+      10.seconds
+    )
+
+  def setBackendClock(date: String): StandaloneWSResponse =
+    Await.result(
+      mkRequest(s"$disaReturnsBackendHost/test-only/clock/$date")
         .put(""),
       10.seconds
     )

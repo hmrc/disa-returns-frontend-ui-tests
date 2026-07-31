@@ -19,28 +19,44 @@ package uk.gov.hmrc.ui.specs
 import org.scalatest.BeforeAndAfterAll
 import uk.gov.hmrc.selenium.webdriver.Driver.instance
 import uk.gov.hmrc.ui.pages.*
+import uk.gov.hmrc.ui.specs.tags.WIP
 
 class FileUploadSpec extends BaseSpec with BeforeAndAfterAll {
 
   override protected def beforeAll(): Unit = {
     super.beforeAll()
 
-    val response = deleteMonthlyDeclarationRequest()
-
-    withClue("Failed to clear Monthly Returns database: ") {
-      response.status shouldBe 204
+    withClue("Failed to clear Monthly Returns Submission database: ") {
+      deleteMonthlyDeclarationRequest().status shouldBe 204
     }
+
+    withClue("Failed to clear Monthly Returns Backend database: ") {
+      deleteMonthlyDeclarationBERequest().status shouldBe 204
+    }
+
+    withClue("Failed to clear Monthly Returns Backend file upload database: ") {
+      deleteMonthlyDeclarationFileRequest().status shouldBe 204
+
+    }
+
+    withClue("Set submission date: ") {
+      setSubmissionsClock().status shouldBe 200
+
+    }
+
+    withClue("Set backend date: ") {
+      setBackendClock().status shouldBe 200
+
+    }
+
   }
 
   Feature("ISA manager logs in and submits a monthly report") {
 
-    Scenario("1. ISA manager logs in and submits a monthly report with js enabled on browser") {
-
-      When("I wait for the file to be uploaded")
-      FileUploadPage.thenWaitForXSeconds(10)
+    Scenario("1. ISA manager logs in and submits a monthly report with js enabled on browser", WIP) {
 
       Given("the ISA manager logs in as an already enrolled organisation User")
-      AuthLoginPage.loginAsEnrolledUser("/monthly-report-submission", "HMRC-DISA-ORG", "ZREF", "Z1027")
+      AuthLoginPage.loginAsEnrolledUser("/monthly-report-submission", "HMRC-DISA-ORG", "ZREF", "Z1122")
 
       Then("The 'Organisation is Enrolled' page is displayed")
       MonthlyReportSubmissionPage.verifyPageTitle(
@@ -67,7 +83,7 @@ class FileUploadSpec extends BaseSpec with BeforeAndAfterAll {
       FileUploadPage.clickContinue()
 
       And("I wait for the file to be uploaded")
-      FileUploadPage.thenWaitForXSeconds(10)
+      FileUploadPage.thenWaitForXSeconds(20)
 
       Then("the user clicks on the No radio button and then clicks on continue button on 'file uploaded' page")
       UploadedReportFilesPage.clickRadioButton("No")
@@ -183,11 +199,14 @@ class FileUploadSpec extends BaseSpec with BeforeAndAfterAll {
         FileProcessingPage.pageUrl
       ) shouldBe true
 
-      /*  And("I wait for the file to be uploaded")
-      FileUploadPage.thenWaitForXSeconds(10)*/
+      And("I wait for the file to be uploaded")
+      FileUploadPage.thenWaitForXSeconds(10)
 
       Then("the user clicks on Check the progress of uploading file link")
       FileProcessingPage.clickOnByLinkText("Check the progress of the uploading file.")
+
+      And("I wait for the file to be uploaded")
+      FileProcessingPage.thenWaitForXSeconds(10)
 
       Then("the user clicks on continue button on 'file processing' page")
       FileProcessingPage.clickContinue()
