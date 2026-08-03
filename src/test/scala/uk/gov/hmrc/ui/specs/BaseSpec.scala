@@ -44,7 +44,7 @@ trait BaseSpec
     "http://localhost:1207/disa-returns-backend/test-only/monthly-return-file-upload-work-items"
   val SetSubmissionsClock                    = "http://localhost:12103/disa-returns-submission/test-only/clock/2026-07-17"
   val SetBackendClock                        = "http://localhost:1207/disa-returns-backend/test-only/clock/2026-07-17"
-  val declarationPeriodDate: String          = "2026-07-31"
+  val declarationPeriodDate: String          = "2026-08-17"
 
   def deleteMonthlyDeclarationRequest(
   ): StandaloneWSResponse =
