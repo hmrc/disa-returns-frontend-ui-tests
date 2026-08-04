@@ -42,9 +42,10 @@ trait BaseSpec
   val DeleteMonthlyReturnsBackendUrl         = "http://localhost:1207/disa-returns-backend/test-only/monthly-returns"
   val DeleteMonthlyReturnsFileUploadUrl      =
     "http://localhost:1207/disa-returns-backend/test-only/monthly-return-file-upload-work-items"
-  val SetSubmissionsClock                    = "http://localhost:12103/disa-returns-submission/test-only/clock/2026-07-17"
-  val SetBackendClock                        = "http://localhost:1207/disa-returns-backend/test-only/clock/2026-07-17"
+  val SetSubmissionsClock                    = "http://localhost:12103/disa-returns-submission/test-only/clock/2026-08-17"
+  val SetBackendClock                        = "http://localhost:1207/disa-returns-backend/test-only/clock/2026-08-17"
   val declarationPeriodDate: String          = "2026-08-17"
+  val fileProcessingDate: String             = "2026-08-18"
 
   def deleteMonthlyDeclarationRequest(
   ): StandaloneWSResponse =
@@ -71,9 +72,13 @@ trait BaseSpec
     )
 
   def setBackendClock(
+    date: String = declarationPeriodDate
   ): StandaloneWSResponse =
     disaReturnsService.setBackendClock(
-      date = declarationPeriodDate
+      date = date
     )
+
+  def advanceBackendClock(): StandaloneWSResponse =
+    setBackendClock(fileProcessingDate)
 
 }

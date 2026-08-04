@@ -34,6 +34,7 @@ trait BasePage extends PageObject with Matchers {
   val signInButtonClassName: By = By.partialLinkText("Sign in")
   val saveAndContinueButton: By = By.xpath("//button[contains(text(),'Save and continue')]")
   val continueButton: By        = By.xpath("//button[contains(text(),'Continue')]")
+  val uploadButton: By          = By.xpath("//button[contains(text(),'Upload')]")
   val agreeAndSubmit: By        = By.xpath("//button[contains(text(),'I agree - submit')]")
   val signOutButton: By         = By.xpath("//a[contains(text(),'Sign out')]")
   val pageHeader: By            = By.xpath("//h1")
@@ -153,6 +154,9 @@ trait BasePage extends PageObject with Matchers {
 
   def clickContinue(): Unit =
     click(continueButton)
+
+  def clickUpload(): Unit =
+    click(uploadButton)
 
   def clickAgreeAndSubmit(): Unit =
     click(agreeAndSubmit)
