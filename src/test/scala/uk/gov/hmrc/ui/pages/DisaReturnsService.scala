@@ -25,7 +25,7 @@ import uk.gov.hmrc.apitestrunner.http.HttpClient
 import scala.concurrent.Await
 import scala.concurrent.duration.*
 
-class DisaReturnsService extends HttpClient {
+trait DisaReturnsService extends HttpClient {
 
   private lazy val disaReturnsHost: String           = TestEnvironment.url("disa-returns")
   private lazy val disaReturnsSubmissionHost: String = TestEnvironment.url("disa-returns-submission")
@@ -48,7 +48,7 @@ class DisaReturnsService extends HttpClient {
       10.seconds
     )
 
-  def DeleteAll(
+  def deleteAll(
     url: String
   ): StandaloneWSResponse =
     Await.result(
@@ -105,17 +105,34 @@ class DisaReturnsService extends HttpClient {
       10.seconds
     )
 
-  def setClock(date: String): StandaloneWSResponse =
+  def setSubmissionsClock(date: String): StandaloneWSResponse =
     Await.result(
       mkRequest(s"$disaReturnsSubmissionHost/test-only/clock/$date")
         .put(""),
       10.seconds
     )
 
+  def setClock(date: String): StandaloneWSResponse =
+    setSubmissionsClock(date)
+
   def setBackendClock(date: String): StandaloneWSResponse =
     Await.result(
       mkRequest(s"$disaReturnsBackendHost/test-only/clock/$date")
         .put(""),
+      10.seconds
+    )
+
+  def resetSubmissionClock(): StandaloneWSResponse =
+    Await.result(
+      mkRequest(s"$disaReturnsSubmissionHost/test-only/clock")
+        .delete(),
+      10.seconds
+    )
+
+  def resetBackendClock(): StandaloneWSResponse =
+    Await.result(
+      mkRequest(s"$disaReturnsBackendHost/test-only/clock")
+        .delete(),
       10.seconds
     )
 
