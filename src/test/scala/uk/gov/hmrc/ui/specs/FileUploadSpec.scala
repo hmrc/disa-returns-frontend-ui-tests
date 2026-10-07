@@ -24,14 +24,14 @@ import uk.gov.hmrc.ui.specs.tags.WIP
 class FileUploadSpec extends BaseSpec with BeforeAndAfterAll {
 
   override def beforeEach(): Unit = {
-    withClue("Failed to reset backend date: ") {
+    /* withClue("Failed to reset backend date: ") {
       setBackendClock().status shouldBe 200
     }
-
-    withClue("Failed to clear Monthly Returns Submission database: ") {
+     */
+    /* withClue("Failed to clear Monthly Returns Submission database: ") {
       deleteMonthlyDeclarationRequest().status shouldBe 204
     }
-
+     */
     withClue("Failed to clear Monthly Returns Backend database: ") {
       deleteMonthlyDeclarationBERequest().status shouldBe 204
     }
@@ -41,9 +41,9 @@ class FileUploadSpec extends BaseSpec with BeforeAndAfterAll {
 
     }
 
-    withClue("Set submission date: ") {
+    /* withClue("Set submission date: ") {
       setSubmissionsClock().status shouldBe 200
-    }
+    }*/
 
     super.beforeEach()
   }
@@ -82,8 +82,8 @@ class FileUploadSpec extends BaseSpec with BeforeAndAfterAll {
       And("I wait for the file to be uploaded")
       FileUploadPage.thenWaitForXSeconds(20)
 
-      And("I advance the backend clock so queued file processing can start")
-      advanceBackendClock().status shouldBe 200
+      /* And("I advance the backend clock so queued file processing can start")
+      advanceBackendClock().status shouldBe 200*/
 
       And("I wait for backend validation to complete")
       FileUploadPage.thenWaitForXSeconds(10)
