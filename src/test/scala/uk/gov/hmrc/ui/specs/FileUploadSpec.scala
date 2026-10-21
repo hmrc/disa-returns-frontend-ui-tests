@@ -53,7 +53,7 @@ class FileUploadSpec extends BaseSpec with BeforeAndAfterAll {
     Scenario("1. ISA manager logs in and submits a monthly report with js enabled on browser", WIP) {
 
       Given("the ISA manager logs in as an already enrolled organisation User")
-      AuthLoginPage.loginAsEnrolledUser("/monthly-report-submission", "HMRC-DISA-ORG", "ZREF", "Z1122")
+      AuthLoginPage.loginAsEnrolledUser("/monthly-report-submission", "HMRC-DISA-ORG", "ZREF", "Z1234")
 
       Then("The 'Organisation is Enrolled' page is displayed")
       MonthlyReportSubmissionPage.verifyPageTitle(
