@@ -29,10 +29,10 @@ trait DisaReturnsService extends HttpClient {
 
   private lazy val disaReturnsHost: String           = TestEnvironment.url("disa-returns")
   private lazy val disaReturnsSubmissionHost: String = TestEnvironment.url("disa-returns-submission")
-  private lazy val disaReturnsBackendHost: String    = TestEnvironment.url("disa-returns-backend")
   private lazy val disaReturnsPath: String           = "/monthly"
   private lazy val disaReturnsCallbackPath: String   = "/callback/monthly"
   private lazy val disaReturnsBase: String           = s"$disaReturnsHost$disaReturnsPath"
+  private val testZReferences: Seq[String]           = Seq("Z1234", "Z1133", "Z1025")
 
   def postSubmission(
     isaManagerReference: String,
@@ -54,6 +54,14 @@ trait DisaReturnsService extends HttpClient {
     Await.result(
       mkRequest(url)
         .delete(),
+      10.seconds
+    )
+
+  def deleteMonthlyDeclarationRequest(): StandaloneWSResponse =
+    Await.result(
+      mkRequest(s"$disaReturnsSubmissionHost/test-only/monthly-returns")
+        .addHttpHeaders("Content-Type" -> "application/json")
+        .post(Json.stringify(Json.obj("zReferences" -> testZReferences))),
       10.seconds
     )
 
@@ -105,54 +113,29 @@ trait DisaReturnsService extends HttpClient {
       10.seconds
     )
 
-//  def setSubmissionsClock(date: String): StandaloneWSResponse =
-//    Await.result(
-//      mkRequest(s"$disaReturnsSubmissionHost/test-only/overrides")
-//        .put(""),
-//      10.seconds
-//    )
   def setSubmissionsClock(date: String): StandaloneWSResponse =
     Await.result(
       mkRequest(s"$disaReturnsSubmissionHost/test-only/overrides")
         .addHttpHeaders("Content-Type" -> "application/json")
         .put(
-          s"""{
-           |  "zReferences": ["Z1234","Z1133","Z1025"],
-           |  "clock": {
-           |    "date": "$date"
-           |  }
-           |}""".stripMargin
+          Json.stringify(
+            Json.obj(
+              "zReferences"     -> testZReferences,
+              "clock"           -> Json.obj("date" -> date),
+              "reportingWindow" -> JsNull
+            )
+          )
         ),
       10.seconds
     )
   def setClock(date: String): StandaloneWSResponse            =
     setSubmissionsClock(date)
 
-  def setBackendClock(date: String): StandaloneWSResponse =
+  def resetSubmissionOverrides(): StandaloneWSResponse =
     Await.result(
-      mkRequest(s"$disaReturnsBackendHost/test-only/overrides")
+      mkRequest(s"$disaReturnsSubmissionHost/test-only/overrides/delete")
         .addHttpHeaders("Content-Type" -> "application/json")
-        .put(
-          s"""{
-             |  "zReferences": ["Z1234","Z1133","Z1025"],
-             |  "clock": {
-             |    "date": "$date"
-             |  }
-             |}""".stripMargin
-        ),
-      10.seconds
-    )
-  def resetSubmissionClock(): StandaloneWSResponse        =
-    Await.result(
-      mkRequest(s"$disaReturnsSubmissionHost/test-only/overrides")
-        .delete(),
-      10.seconds
-    )
-
-  def resetBackendClock(): StandaloneWSResponse =
-    Await.result(
-      mkRequest(s"$disaReturnsBackendHost/test-only/overrides")
-        .delete(),
+        .post(Json.stringify(Json.obj("zReferences" -> testZReferences))),
       10.seconds
     )
 

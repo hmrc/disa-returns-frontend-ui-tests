@@ -35,26 +35,17 @@ trait BaseSpec
   override def beforeEach(): Unit =
     startBrowser()
 
-  override def afterEach(): Unit = {
-    quitBrowser()
-    resetSubmissionClock()
-    resetBackendClock()
-  }
+  override def afterEach(): Unit =
+    try quitBrowser()
+    finally
+      withClue("Failed to reset submission overrides: ") {
+        resetSubmissionOverrides().status shouldBe 204
+      }
 
-  val DeleteMonthlyReturnsUrl           = "http://localhost:12103/disa-returns-submission/test-only/monthly-returns"
   val DeleteMonthlyReturnsBackendUrl    = "http://localhost:1207/disa-returns-backend/test-only/monthly-returns"
   val DeleteMonthlyReturnsFileUploadUrl =
     "http://localhost:1207/disa-returns-backend/test-only/monthly-return-file-upload-work-items"
-  val SetSubmissionsClock               = "http://localhost:12103/disa-returns-submission/test-only/overrides"
-  val SetBackendClock                   = "http://localhost:1207/disa-returns-backend/test-only/overrides"
   val declarationPeriodDate: String     = "2026-08-17"
-  val fileProcessingDate: String        = "2026-08-18"
-
-  def deleteMonthlyDeclarationRequest(
-  ): StandaloneWSResponse =
-    deleteAll(
-      url = DeleteMonthlyReturnsUrl
-    )
 
   def deleteMonthlyDeclarationBERequest(
   ): StandaloneWSResponse =
@@ -73,13 +64,5 @@ trait BaseSpec
     setSubmissionsClock(
       date = declarationPeriodDate
     )
-
-  def setBackendClock(): StandaloneWSResponse =
-    setBackendClock(
-      date = declarationPeriodDate
-    )
-
-  def advanceBackendClock(): StandaloneWSResponse =
-    setBackendClock(fileProcessingDate)
 
 }
