@@ -105,33 +105,53 @@ trait DisaReturnsService extends HttpClient {
       10.seconds
     )
 
+//  def setSubmissionsClock(date: String): StandaloneWSResponse =
+//    Await.result(
+//      mkRequest(s"$disaReturnsSubmissionHost/test-only/overrides")
+//        .put(""),
+//      10.seconds
+//    )
   def setSubmissionsClock(date: String): StandaloneWSResponse =
     Await.result(
-      mkRequest(s"$disaReturnsSubmissionHost/test-only/clock/$date")
-        .put(""),
+      mkRequest(s"$disaReturnsSubmissionHost/test-only/overrides")
+        .addHttpHeaders("Content-Type" -> "application/json")
+        .put(
+          s"""{
+           |  "zReferences": ["Z1234","Z1133","Z1025"],
+           |  "clock": {
+           |    "date": "$date"
+           |  }
+           |}""".stripMargin
+        ),
       10.seconds
     )
-
-  def setClock(date: String): StandaloneWSResponse =
+  def setClock(date: String): StandaloneWSResponse            =
     setSubmissionsClock(date)
 
   def setBackendClock(date: String): StandaloneWSResponse =
     Await.result(
-      mkRequest(s"$disaReturnsBackendHost/test-only/clock/$date")
-        .put(""),
+      mkRequest(s"$disaReturnsBackendHost/test-only/overrides")
+        .addHttpHeaders("Content-Type" -> "application/json")
+        .put(
+          s"""{
+             |  "zReferences": ["Z1234","Z1133","Z1025"],
+             |  "clock": {
+             |    "date": "$date"
+             |  }
+             |}""".stripMargin
+        ),
       10.seconds
     )
-
-  def resetSubmissionClock(): StandaloneWSResponse =
+  def resetSubmissionClock(): StandaloneWSResponse        =
     Await.result(
-      mkRequest(s"$disaReturnsSubmissionHost/test-only/clock")
+      mkRequest(s"$disaReturnsSubmissionHost/test-only/overrides")
         .delete(),
       10.seconds
     )
 
   def resetBackendClock(): StandaloneWSResponse =
     Await.result(
-      mkRequest(s"$disaReturnsBackendHost/test-only/clock")
+      mkRequest(s"$disaReturnsBackendHost/test-only/overrides")
         .delete(),
       10.seconds
     )

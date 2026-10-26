@@ -41,9 +41,9 @@ class FileUploadSpec extends BaseSpec with BeforeAndAfterAll {
 
     }
 
-    /* withClue("Set submission date: ") {
-      setSubmissionsClock().status shouldBe 200
-    }*/
+    withClue("Set submission date: ") {
+      setSubmissionsClock().status shouldBe 204
+    }
 
     super.beforeEach()
   }
