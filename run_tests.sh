@@ -1,14 +1,12 @@
-   #!/usr/bin/env bash
+#!/usr/bin/env bash
 
-    BROWSER=${1:-chrome}
-    JOURNEY=${2:-DISA}
+DEFAULT_BROWSER=chrome
+BROWSER_TYPE=$1
+ENV=$2
 
-    echo "Running browser tests..."
-    echo "=========================================="
-    echo "Browser:              ${BROWSER}"
-    echo "Env:                  local"
-    echo "Journey:              ${JOURNEY}"
-    echo "=========================================="
-    sbt clean -Dbrowser="${BROWSER}" -Dbrowser.option.headless=false -Denvironment=local "testOnly uk.gov.hmrc.ui.specs.*" testReport
+if [ -z "$BROWSER_TYPE" ]; then
+    echo "BROWSER_TYPE value not set, defaulting to $DEFAULT_BROWSER..."
+    echo ""
+fi
 
-    #sbt clean -Dbrowser="${BROWSER_TYPE:=$DEFAULT_BROWSER}" -Denvironment="${ENV:=local}" "testOnly uk.gov.hmrc.ui.disa.specs.*" test testReport
+sbt clean -Dbrowser="${BROWSER_TYPE:=$DEFAULT_BROWSER}" -Denvironment="${ENV:=local}" "testOnly uk.gov.hmrc.ui.disa.specs.*" test testReport

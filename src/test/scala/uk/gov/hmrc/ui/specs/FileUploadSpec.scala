@@ -19,7 +19,6 @@ package uk.gov.hmrc.ui.specs
 import org.scalatest.BeforeAndAfterAll
 import uk.gov.hmrc.selenium.webdriver.Driver.instance
 import uk.gov.hmrc.ui.pages.*
-import uk.gov.hmrc.ui.specs.tags.WIP
 
 class FileUploadSpec extends BaseSpec with BeforeAndAfterAll {
 
@@ -44,7 +43,7 @@ class FileUploadSpec extends BaseSpec with BeforeAndAfterAll {
 
   Feature("ISA manager logs in and submits a monthly report") {
 
-    Scenario("1. ISA manager logs in and submits a monthly report with js enabled on browser", WIP) {
+    Scenario("1. ISA manager logs in and submits a monthly report with js enabled on browser") {
 
       Given("the ISA manager logs in as an already enrolled organisation User")
       AuthLoginPage.loginAsEnrolledUser("/monthly-report-submission", "HMRC-DISA-ORG", "ZREF", "Z1234")
@@ -74,9 +73,6 @@ class FileUploadSpec extends BaseSpec with BeforeAndAfterAll {
       FileUploadPage.clickContinue()
 
       And("I wait for the file to be uploaded")
-      FileUploadPage.thenWaitForXSeconds(20)
-
-      And("I wait for backend validation to complete")
       FileUploadPage.thenWaitForXSeconds(10)
 
       Then("the user clicks on the No radio button and then clicks on continue button on 'file uploaded' page")
@@ -195,9 +191,6 @@ class FileUploadSpec extends BaseSpec with BeforeAndAfterAll {
 
       And("I wait for the file to be uploaded")
       FileUploadPage.thenWaitForXSeconds(10)
-
-      And("I wait for backend validation to complete")
-      FileProcessingPage.thenWaitForXSeconds(10)
 
       Then("the user clicks on Check the progress of uploading file link")
       FileProcessingPage.clickOnByLinkText("Check the progress of the uploading file.")
