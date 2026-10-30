@@ -16,9 +16,17 @@
 
 package uk.gov.hmrc.ui.pages
 
-object FIleUploadPage extends BasePage {
-  val pageUrl: String   = s"$baseUrl/file-upload"
-  val pageTitle: String =
-    "Upload your report file - Manage ISAs - GOV.UK"
+import org.openqa.selenium.By
+import uk.gov.hmrc.ui.pages.FileUploadPage.secondsWait
 
+object FileProcessingPage extends BasePage {
+  val pageUrl: String        = s"$baseUrl/file-processing"
+  val pageTitle: String      = "Your file is being checked - Manage ISAs - GOV.UK"
+  val continueLinkButton: By = By.xpath("//a[contains(@class,'govuk-button') and normalize-space()='Continue']")
+
+  def thenWaitForXSeconds(secs: Int): Unit =
+    secondsWait(secs)
+
+  override def clickContinue(): Unit =
+    click(continueLinkButton)
 }

@@ -16,10 +16,22 @@
 
 package uk.gov.hmrc.ui.pages
 
-object UlploadedReportFilesPage extends BasePage {
-  val pageUrl: String      = s"$baseUrl/uploaded-report-files"
-  val pageTitle: String    =
-    "You have added a report file - Manage ISAs - GOV.UK"
-  val pageTitleTwo: String =
-    "You have added 2 report files - Manage ISAs - GOV.UK"
+object FileUploadPage extends BasePage {
+  val pageUrl: String   = s"$baseUrl/file-upload"
+  val pageTitle: String =
+    "Upload your report file - Manage ISAs - GOV.UK"
+
+  def uploadFile(fileSeq: String): Unit = uploadFilesToBrowser(fileSeq, "file-input")
+
+  def uploadFileJSDisabled(fileSeq: String): Unit = uploadFilesToBrowser(fileSeq, "file")
+
+  def chooseFileAndUploadFile(fileSeq: String): Unit =
+    FileUploadPage.uploadFile(fileSeq)
+
+  def chooseFileAndUploadFileJSDisabled(fileSeq: String): Unit =
+    FileUploadPage.uploadFileJSDisabled(fileSeq)
+
+  def thenWaitForXSeconds(secs: Int): Unit =
+    secondsWait(secs)
+
 }

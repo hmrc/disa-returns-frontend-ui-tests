@@ -19,7 +19,9 @@ package uk.gov.hmrc.ui.specs
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.{BeforeAndAfterEach, GivenWhenThen}
+import play.api.libs.ws.StandaloneWSResponse
 import uk.gov.hmrc.selenium.webdriver.{Browser, ScreenshotOnFailure}
+import uk.gov.hmrc.ui.pages.DisaReturnsService
 
 trait BaseSpec
     extends AnyFeatureSpec
@@ -27,12 +29,40 @@ trait BaseSpec
     with Matchers
     with BeforeAndAfterEach
     with Browser
-    with ScreenshotOnFailure {
+    with ScreenshotOnFailure
+    with DisaReturnsService {
 
   override def beforeEach(): Unit =
     startBrowser()
 
   override def afterEach(): Unit =
-    quitBrowser()
+    try quitBrowser()
+    finally
+      withClue("Failed to reset submission overrides: ") {
+        resetSubmissionOverrides().status shouldBe 204
+      }
+
+  val DeleteMonthlyReturnsBackendUrl    = "http://localhost:1207/disa-returns-backend/test-only/monthly-returns"
+  val DeleteMonthlyReturnsFileUploadUrl =
+    "http://localhost:1207/disa-returns-backend/test-only/monthly-return-file-upload-work-items"
+  val declarationPeriodDate: String     = "2026-08-17"
+
+  def deleteMonthlyDeclarationBERequest(
+  ): StandaloneWSResponse =
+    deleteAll(
+      url = DeleteMonthlyReturnsBackendUrl
+    )
+
+  def deleteMonthlyDeclarationFileRequest(
+  ): StandaloneWSResponse =
+    deleteAll(
+      url = DeleteMonthlyReturnsFileUploadUrl
+    )
+
+  def setSubmissionsClock(
+  ): StandaloneWSResponse =
+    setSubmissionsClock(
+      date = declarationPeriodDate
+    )
 
 }

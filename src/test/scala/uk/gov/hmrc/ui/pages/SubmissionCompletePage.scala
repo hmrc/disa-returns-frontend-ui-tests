@@ -16,8 +16,8 @@
 
 package uk.gov.hmrc.ui.pages
 
-object DeclarationNilReturnTruePage extends BasePage {
-  val pageUrl: String   = s"$baseUrl/declaration?nilReturn=true"
+object SubmissionCompletePage extends BasePage {
+  val pageUrl: String   = s"$baseUrl/submission-complete"
   val pageTitle: String =
-    "Declaration for nil report - Manage ISAs - GOV.UK"
+    "Submission complete - Manage ISAs - GOV.UK"
 }

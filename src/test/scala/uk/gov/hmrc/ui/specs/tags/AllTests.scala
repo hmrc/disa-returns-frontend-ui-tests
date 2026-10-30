@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.ui.pages
+package uk.gov.hmrc.ui.specs.tags
 
-object DeclarationNilReturnFalsePage extends BasePage {
-  val pageUrl: String   = s"$baseUrl/declaration?nilReturn=false"
-  val pageTitle: String =
-    "Declaration - Manage ISAs - GOV.UK"
-}
+import org.scalatest.Tag
+
+object AllTests extends Tag("AllTests")
+
+object LOJourney extends Tag("LOJourney")
+
+object WIP extends Tag("WIP")
+
+object BrowserStack extends Tag("BrowserStack")
