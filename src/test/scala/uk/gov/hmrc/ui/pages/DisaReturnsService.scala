@@ -21,6 +21,7 @@ import play.api.libs.ws.DefaultBodyWritables.writeableOf_String
 import play.api.libs.ws.StandaloneWSResponse
 import uk.gov.hmrc.api.conf.TestEnvironment
 import uk.gov.hmrc.apitestrunner.http.HttpClient
+import uk.gov.hmrc.ui.conf.TestConfiguration
 
 import scala.concurrent.Await
 import scala.concurrent.duration.*
@@ -28,11 +29,11 @@ import scala.concurrent.duration.*
 trait DisaReturnsService extends HttpClient {
 
   private lazy val disaReturnsHost: String           = TestEnvironment.url("disa-returns")
+  private lazy val disaReturnsBackendHost: String    = TestEnvironment.url("disa-returns-backend")
   private lazy val disaReturnsSubmissionHost: String = TestEnvironment.url("disa-returns-submission")
   private lazy val disaReturnsPath: String           = "/monthly"
   private lazy val disaReturnsCallbackPath: String   = "/callback/monthly"
   private lazy val disaReturnsBase: String           = s"$disaReturnsHost$disaReturnsPath"
-  private val testZReferences: Seq[String]           = Seq("Z1234", "Z1133", "Z1025")
 
   def postSubmission(
     isaManagerReference: String,
@@ -48,22 +49,60 @@ trait DisaReturnsService extends HttpClient {
       10.seconds
     )
 
-  def deleteAll(
-    url: String
-  ): StandaloneWSResponse =
+  private def postJson(url: String, body: JsObject): StandaloneWSResponse =
     Await.result(
-      mkRequest(url)
-        .delete(),
+      mkRequest(url).addHttpHeaders("Content-Type" -> "application/json").post(Json.stringify(body)),
       10.seconds
     )
 
-  def deleteMonthlyDeclarationRequest(): StandaloneWSResponse =
+  def deleteBackendMonthlyReturnsRequest(zReferences: Seq[String]): StandaloneWSResponse =
+    postJson(
+      s"$disaReturnsBackendHost/test-only/monthly-returns/cleanup",
+      Json.obj("zReferences" -> zReferences)
+    )
+
+  def deleteSubmissionMonthlyReturnsRequest(zReferences: Seq[String]): StandaloneWSResponse =
+    postJson(
+      s"$disaReturnsSubmissionHost/test-only/monthly-returns/cleanup",
+      Json.obj("zReferences" -> zReferences)
+    )
+
+  def getSubmissionMonthlyReturn(path: String): StandaloneWSResponse =
     Await.result(
-      mkRequest(s"$disaReturnsSubmissionHost/test-only/monthly-returns")
-        .addHttpHeaders("Content-Type" -> "application/json")
-        .post(Json.stringify(Json.obj("zReferences" -> testZReferences))),
+      mkRequest(s"$disaReturnsSubmissionHost$path")
+        .addHttpHeaders(
+          "Authorization" -> TestConfiguration.envConfig.getString("services.disa-returns-submission.internalAuthToken")
+        )
+        .get(),
       10.seconds
     )
+
+  def getBackendMonthlyReturn(path: String, authorization: String): StandaloneWSResponse =
+    Await.result(
+      mkRequest(s"$disaReturnsBackendHost$path").addHttpHeaders("Authorization" -> authorization).get(),
+      10.seconds
+    )
+
+  def backendAuthorization(zReference: String): String = {
+    val response = postJson(
+      TestEnvironment.url("auth-login-api"),
+      Json.obj(
+        "credId"             -> s"000000000000${zReference.drop(1)}",
+        "affinityGroup"      -> "Organisation",
+        "credentialStrength" -> "strong",
+        "credentialRole"     -> "admin",
+        "enrolments"         -> Json.arr(
+          Json.obj(
+            "key"         -> "HMRC-DISA-ORG",
+            "identifiers" -> Json.arr(Json.obj("key" -> "ZREF", "value" -> zReference)),
+            "state"       -> "Activated"
+          )
+        )
+      )
+    )
+    require(response.status == 201, s"Failed to get backend authorization for $zReference: HTTP ${response.status}")
+    response.header("Authorization").getOrElse(throw new IllegalStateException("Auth login returned no bearer token"))
+  }
 
   def postDeclaration(
     isaManagerReference: String,
@@ -113,14 +152,14 @@ trait DisaReturnsService extends HttpClient {
       10.seconds
     )
 
-  def setSubmissionsClock(date: String): StandaloneWSResponse =
+  def setSubmissionsClock(date: String, zReferences: Seq[String]): StandaloneWSResponse =
     Await.result(
       mkRequest(s"$disaReturnsSubmissionHost/test-only/overrides")
         .addHttpHeaders("Content-Type" -> "application/json")
         .put(
           Json.stringify(
             Json.obj(
-              "zReferences"     -> testZReferences,
+              "zReferences"     -> zReferences,
               "clock"           -> Json.obj("date" -> date),
               "reportingWindow" -> JsNull
             )
@@ -128,15 +167,10 @@ trait DisaReturnsService extends HttpClient {
         ),
       10.seconds
     )
-  def setClock(date: String): StandaloneWSResponse            =
-    setSubmissionsClock(date)
-
-  def resetSubmissionOverrides(): StandaloneWSResponse =
-    Await.result(
-      mkRequest(s"$disaReturnsSubmissionHost/test-only/overrides/delete")
-        .addHttpHeaders("Content-Type" -> "application/json")
-        .post(Json.stringify(Json.obj("zReferences" -> testZReferences))),
-      10.seconds
+  def resetSubmissionOverrides(zReferences: Seq[String]): StandaloneWSResponse          =
+    postJson(
+      s"$disaReturnsSubmissionHost/test-only/overrides/delete",
+      Json.obj("zReferences" -> zReferences)
     )
 
   def makeReturnSummaryCallback(

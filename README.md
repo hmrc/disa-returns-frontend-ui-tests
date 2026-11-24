@@ -1,5 +1,3 @@
-**This is the template README. Please update this with project specific content.**
-
 # disa-returns-frontend-ui-tests
 
 disa-returns-frontend UI journey tests.
@@ -20,16 +18,26 @@ Start `DISA_RETURNS_ALL` services as follows:
 sm2 --start DISA_RETURNS_ALL
 ```
 
+The test uses local `AUTH_LOGIN_API` for a backend read session and the local backend internal-auth token to read
+submission status. Leave the backend and submission workers enabled.
+
 ## Tests
 
-Run tests as follows:
-
-* Argument `<browser>` must be `chrome`, `edge`, or `firefox`.
-* Argument `<environment>` must be `local`, `dev`, `qa` or `staging`.
+Run locally with `chrome`, `edge`, or `firefox`:
 
 ```bash
-sbt clean -Dbrowser="<browser>" -Denvironment="<environment>" test testReport
+sbt -Dbrowser="<browser>" -Denvironment=local test testReport
 ```
+
+### Test data
+
+`FileUploadSpec` reserves `Z9101`, `Z9102`, and `Z9103`. `BaseSpec` clears the suite's references before the suite,
+then clears only the scenario's reference before and after each successful scenario, calling backend first and
+submission second. Clock overrides are set and reset for the same reference.
+
+The confirmation page only confirms the declaration was accepted. Teardown waits for `npsDeclaredOn` and, for
+file uploads, backend's `SUBMITTED` status before deleting return data. If the scenario fails or polling times out,
+the test resets its clock override but leaves unverified data for the next scoped reset.
 
 ## Scalafmt
 
