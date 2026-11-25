@@ -16,37 +16,34 @@
 
 package uk.gov.hmrc.ui.specs
 
-import org.scalatest.BeforeAndAfterAll
 import uk.gov.hmrc.selenium.webdriver.Driver.instance
 import uk.gov.hmrc.ui.pages.*
 
-class FileUploadSpec extends BaseSpec with BeforeAndAfterAll {
+class FileUploadSpec extends BaseSpec {
 
-  override def beforeEach(): Unit = {
-    withClue("Failed to clear Monthly Returns Submission database: ") {
-      deleteMonthlyDeclarationRequest().status shouldBe 204
-    }
-    withClue("Failed to clear Monthly Returns Backend database: ") {
-      deleteMonthlyDeclarationBERequest().status shouldBe 204
-    }
+  private val fileUploadZReference                    = "Z9101"
+  private val nilReturnZReference                     = "Z9102"
+  private val noJavaScriptZReference                  = "Z9103"
+  override protected val testZReferences: Seq[String] =
+    Seq(fileUploadZReference, nilReturnZReference, noJavaScriptZReference)
 
-    withClue("Failed to clear Monthly Returns Backend file upload database: ") {
-      deleteMonthlyDeclarationFileRequest().status shouldBe 204
-    }
-
-    withClue("Set submission date: ") {
-      setSubmissionsClock().status shouldBe 204
-    }
-
-    super.beforeEach()
-  }
+  private val monthlyReportSubmissionPath = "/monthly-report-submission"
+  private val disaEnrolmentKey            = "HMRC-DISA-ORG"
+  private val zReferenceIdentifier        = "ZREF"
+  private val uploadReportOption          = "Yes - I am uploading a report"
+  private val firstFile                   = "first"
+  private val noMoreFilesOption           = "No"
+  private val uploadWaitSeconds           = 10
 
   Feature("ISA manager logs in and submits a monthly report") {
 
-    Scenario("1. ISA manager logs in and submits a monthly report with js enabled on browser") {
+    monthlyReturnScenario(
+      "1. ISA manager logs in and submits a monthly report with js enabled on browser",
+      fileUploadZReference
+    ) { zReference =>
 
       Given("the ISA manager logs in as an already enrolled organisation User")
-      AuthLoginPage.loginAsEnrolledUser("/monthly-report-submission", "HMRC-DISA-ORG", "ZREF", "Z1234")
+      AuthLoginPage.loginAsEnrolledUser(monthlyReportSubmissionPath, disaEnrolmentKey, zReferenceIdentifier, zReference)
 
       Then("The 'Organisation is Enrolled' page is displayed")
       MonthlyReportSubmissionPage.verifyPageTitle(
@@ -57,7 +54,7 @@ class FileUploadSpec extends BaseSpec with BeforeAndAfterAll {
       When(
         "the user clicks on the Yes radio button and then clicks on save and continue button on 'Monthly Report Submission' page"
       )
-      MonthlyReportSubmissionPage.clickRadioButton("Yes - I am uploading a report")
+      MonthlyReportSubmissionPage.clickRadioButton(uploadReportOption)
       MonthlyReportSubmissionPage.clickSaveAndContinue()
 
       Then("the user is navigated to the 'File Upload' page")
@@ -67,16 +64,16 @@ class FileUploadSpec extends BaseSpec with BeforeAndAfterAll {
       ) shouldBe true
 
       When("User selects a valid file upload")
-      FileUploadPage.chooseFileAndUploadFile("first")
+      FileUploadPage.chooseFileAndUploadFile(firstFile)
 
       And("User clicks Continue button")
       FileUploadPage.clickContinue()
 
       And("I wait for the file to be uploaded")
-      FileUploadPage.thenWaitForXSeconds(10)
+      FileUploadPage.thenWaitForXSeconds(uploadWaitSeconds)
 
       Then("the user clicks on the No radio button and then clicks on continue button on 'file uploaded' page")
-      UploadedReportFilesPage.clickRadioButton("No")
+      UploadedReportFilesPage.clickRadioButton(noMoreFilesOption)
       UploadedReportFilesPage.clickContinue()
 
       Then("the user is navigated to the 'Check Your Answers' page")
@@ -104,10 +101,10 @@ class FileUploadSpec extends BaseSpec with BeforeAndAfterAll {
       ) shouldBe true
 
     }
-    Scenario("2. ISA manager logs in and submits a nil report") {
+    monthlyReturnScenario("2. ISA manager logs in and submits a nil report", nilReturnZReference) { zReference =>
 
       Given("the ISA manager logs in as an already enrolled organisation User")
-      AuthLoginPage.loginAsEnrolledUser("/monthly-report-submission", "HMRC-DISA-ORG", "ZREF", "Z1133")
+      AuthLoginPage.loginAsEnrolledUser(monthlyReportSubmissionPath, disaEnrolmentKey, zReferenceIdentifier, zReference)
 
       Then("The 'Organisation is Enrolled' page is displayed")
       MonthlyReportSubmissionPage.verifyPageTitle(
@@ -146,15 +143,14 @@ class FileUploadSpec extends BaseSpec with BeforeAndAfterAll {
       ) shouldBe true
 
     }
-    Scenario("3. ISA manager logs in and submits a monthly report with js disabled on browser") {
+    monthlyReturnScenario(
+      "3. ISA manager logs in and submits a monthly report with js disabled on browser",
+      noJavaScriptZReference
+    ) { zReference =>
 
       Given("the ISA manager logs in as an already enrolled organisation User")
 
-      When("User clears the data in Monthly returns DB")
-
-      Then("A 204 status code is returned")
-
-      AuthLoginPage.loginAsEnrolledUser("/monthly-report-submission", "HMRC-DISA-ORG", "ZREF", "Z1025")
+      AuthLoginPage.loginAsEnrolledUser(monthlyReportSubmissionPath, disaEnrolmentKey, zReferenceIdentifier, zReference)
 
       Then("The 'Organisation is Enrolled' page is displayed")
       MonthlyReportSubmissionPage.verifyPageTitle(
@@ -168,7 +164,7 @@ class FileUploadSpec extends BaseSpec with BeforeAndAfterAll {
       When(
         "the user clicks on the Yes radio button and then clicks on save and continue button on 'Monthly Report Submission' page"
       )
-      MonthlyReportSubmissionPage.clickRadioButton("Yes - I am uploading a report")
+      MonthlyReportSubmissionPage.clickRadioButton(uploadReportOption)
       MonthlyReportSubmissionPage.clickSaveAndContinue()
 
       Then("the user is navigated to the 'File Upload' page")
@@ -178,7 +174,7 @@ class FileUploadSpec extends BaseSpec with BeforeAndAfterAll {
       ) shouldBe true
 
       When("User selects a valid file for upload")
-      FileUploadPage.chooseFileAndUploadFileJSDisabled("first")
+      FileUploadPage.chooseFileAndUploadFileJSDisabled(firstFile)
 
       And("User clicks Continue button")
       FileUploadPage.clickContinue()
@@ -190,7 +186,7 @@ class FileUploadSpec extends BaseSpec with BeforeAndAfterAll {
       ) shouldBe true
 
       And("I wait for the file to be uploaded")
-      FileUploadPage.thenWaitForXSeconds(10)
+      FileUploadPage.thenWaitForXSeconds(uploadWaitSeconds)
 
       Then("the user clicks on Check the progress of uploading file link")
       FileProcessingPage.clickOnByLinkText("Check the progress of the uploading file.")
@@ -199,7 +195,7 @@ class FileUploadSpec extends BaseSpec with BeforeAndAfterAll {
       FileProcessingPage.clickContinue()
 
       Then("the user clicks on the No radio button and then clicks on continue button on 'file uploaded' page")
-      UploadedReportFilesPage.clickRadioButton("No")
+      UploadedReportFilesPage.clickRadioButton(noMoreFilesOption)
       UploadedReportFilesPage.clickContinue()
 
       Then("the user is navigated to the 'Check Your Answers' page")
